@@ -6,6 +6,7 @@ public class InputManager : MonoBehaviour, Input.IBotActions, Input.IFlowActions
 {
     public event Action<Vector2> MoveEvent;
     public event Action SelectEvent;
+    public event Action MergeEvent;
     public event Action PauseEvent;
     private Input _input;
 
@@ -86,6 +87,14 @@ public class InputManager : MonoBehaviour, Input.IBotActions, Input.IFlowActions
         if (context.phase == InputActionPhase.Performed)
         {
             SelectEvent?.Invoke();
+        }
+    }
+
+    public void OnMerge(InputAction.CallbackContext context)
+    {
+        if (context.phase == InputActionPhase.Performed)
+        {
+            MergeEvent?.Invoke();
         }
     }
 }

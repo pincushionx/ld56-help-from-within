@@ -1,45 +1,43 @@
 using Oneill;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Experimental.AI;
 
 public class BotOrganism : MonoBehaviour
 {
-    public Scene Scene {get; private set; }
+
+    public Scene scene {get; private set; }
 
     public Transform CellContainer;
     public BotCell[] BotCells { get; private set; }
 
 
-    private float _moveSpeedModifier = 1.0f;
-    private Vector2 _targetMoveVector = Vector2.zero;
+    private float _moveSpeedModifier = 5.0f;
+    private Vector2 _moveVector = Vector2.zero;
 
 
-    private float _colliderBuffer = 0.01f;
+    private float _colliderBuffer = 0.05f;
 
+    private bool _animatingMovement = false;
+    private float _animatingMovementStartTime = -1f;
+    private Vector3 _animatingMovementOrigin = Vector3.zero;
+    private Vector3 _animatingMovementTarget = Vector3.zero;
+
+
+    private Neighbour _climbUpDirection = Neighbour.None;
 
     // For reuse
     List<BotCell> _cellsFacingDirection = new List<BotCell>();
 
     //private Rigidbody _rigidbody;
 
-    private void Awake()
-    {
-        //_rigidbody = GetComponent<Rigidbody>();
-
-
-        // Remove once it's initialized somewherE?>
-        InitCells();
-    }
-
+    
     public void Init(Scene scene)
     {
-        Scene = scene;
+        this.scene = scene;
         InitCells();
     }
 
-    private void InitCells()
+    public void InitCells()
     {
         BotCells = CellContainer.GetComponentsInChildren<BotCell>();
         for (int i = 0; i < BotCells.Length; i++)
@@ -60,24 +58,46 @@ public class BotOrganism : MonoBehaviour
 
                 Vector3 diff = compareCell.transform.position - cellPosition;
 
-                // Connect left
-                if (diff.x < 0)
+
+                if (diff.y == 0)
                 {
-                    if (diff.x >= -1.5f)
+                    // Connect left
+                    if (diff.x < 0)
                     {
-                        neighbours[NeighbourUtil.GetNeighbourIndex(Neighbour.Left)] = cell;
+                        if (diff.x >= -1.5f)
+                        {
+                            neighbours[NeighbourUtil.GetNeighbourIndex(Neighbour.Left)] = compareCell;
+                        }
                     }
-                }
-                // Connect right
-                else if (diff.x > 0)
-                {
-                    if (diff.x <= 1.5f)
+                    // Connect right
+                    else if (diff.x > 0)
                     {
-                        neighbours[NeighbourUtil.GetNeighbourIndex(Neighbour.Right)] = cell;
+                        if (diff.x <= 1.5f)
+                        {
+                            neighbours[NeighbourUtil.GetNeighbourIndex(Neighbour.Right)] = compareCell;
+                        }
                     }
                 }
 
-                //TODO connect up/down
+                if (diff.x == 0)
+                {
+                    // Connect down
+                    if (diff.y < 0)
+                    {
+                        if (diff.y >= -1.5f)
+                        {
+                            neighbours[NeighbourUtil.GetNeighbourIndex(Neighbour.Down)] = compareCell;
+                        }
+                    }
+                    // Connect up
+                    else if (diff.y > 0)
+                    {
+                        if (diff.y <= 1.5f)
+                        {
+                            neighbours[NeighbourUtil.GetNeighbourIndex(Neighbour.Up)] = compareCell;
+                        }
+                    }
+                }
             }
 
             cell.Init(this, neighbours);
@@ -86,7 +106,36 @@ public class BotOrganism : MonoBehaviour
 
     private void Update()
     {
-        Vector3 diff = _targetMoveVector * _moveSpeedModifier * Time.deltaTime;
+        if (TimeKeeper.Instance.IsPaused)
+        {
+            return;
+        }
+
+
+        if (_animatingMovement)
+        {
+            transform.position = Vector3.Lerp(_animatingMovementOrigin, _animatingMovementTarget, TimeKeeper.Instance.PlayTimeSince(_animatingMovementStartTime) * _moveSpeedModifier);
+
+            if (Vector3.Distance(transform.position, _animatingMovementTarget) < 0.001f)
+            {
+                _animatingMovement = false;
+            }
+
+            return;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+        Vector3 diff = _moveVector * _moveSpeedModifier * Time.deltaTime;
 
         Vector3 targetPosition = transform.position + diff;
 
@@ -95,120 +144,174 @@ public class BotOrganism : MonoBehaviour
         //Neighbour neighbourMask = NeighbourUtil.GetNeighbourByOffset(diff);
         //Neighbour[] neighbours = NeighbourUtil.GetNeighboursFromMask(neighbourMask);
 
-        if (_targetMoveVector.x != 0)
+        if (_moveVector.x != 0)
         {
-            float sign = (_targetMoveVector.x < 0)? -1 : 1;
+            float sign = (_moveVector.x < 0) ? -1 : 1;
             float dist = diff.x * sign;
-            Neighbour neighbour = sign < 0? Neighbour.Left : Neighbour.Right;
+            Neighbour neighbour = sign < 0 ? Neighbour.Left : Neighbour.Right;
+
+            bool hasXDiff = false;
+            float xDiff = float.MaxValue;
 
 
             BotCell[] cells = GetCellsFacingDirection(neighbour);
             foreach (BotCell cell in cells)
             {
-                Ray ray = new Ray(cell.GetRaycastTransform(neighbour).position, _targetMoveVector);
-                RaycastHit hit = new RaycastHit();
+                BotCell.RaycastResult raycastResult = cell.Raycast(neighbour, dist);
 
-                Debug.DrawRay(ray.origin, ray.direction, Color.red);
-
-                if (Physics.Raycast(ray, out hit, dist, LayerMask.GetMask("Terrain")))
+                if (raycastResult.hit)
                 {
-                    targetPosition.x += (sign * ray.origin.x) - (sign*hit.point.x) - (sign * _colliderBuffer);
-                }
-
-                else if (Physics.Raycast(ray, out hit, dist, LayerMask.GetMask("BotOrganism")))
-                {
-                    BotCollider collider = hit.transform.GetComponent<BotCollider>();
-                    if (collider != null)
+                    Ray ray = raycastResult.ray;
+                    RaycastHit hit = raycastResult.NearestHit;
+                    float newxDiff = (sign * ray.origin.x) - (sign * hit.point.x) - (sign * _colliderBuffer);
+                    if (Mathf.Abs(newxDiff) < Mathf.Abs(xDiff))
                     {
-                        targetPosition.x += (sign * ray.origin.x) - (sign * hit.point.x);
-                        MergeOrganisms(collider.ParentCell.Organism);
+                        xDiff = newxDiff;
+                        hasXDiff = true;
                     }
                 }
             }
+
+            if (hasXDiff)
+            {
+                targetPosition.x += xDiff;
+            }
         }
-
-
-
-        //    if (_targetMoveVector.x < 0)
-        //{
-        //    float dist = -diff.x;
-        //    Neighbour neighbour = Neighbour.Left;
-        //    BotCell[] cells = GetCellsFacingDirection(neighbour);
-
-        //    foreach (BotCell cell in cells)
-        //    {
-        //        Ray ray = new Ray(cell.GetRaycastTransform(neighbour).position, _targetMoveVector);
-        //        RaycastHit hit = new RaycastHit();
-        //        Debug.DrawRay(ray.origin, ray.direction, Color.red);
-        //        if (Physics.Raycast(ray, out hit, dist, LayerMask.GetMask("Terrain")))
-        //        {
-        //            targetPosition.x += hit.point.x - ray.origin.x + _colliderBuffer;
-        //        }
-        //        else if (Physics.Raycast(ray, out hit, dist, LayerMask.GetMask("BotOrganism")))
-        //        {
-        //            BotCollider collider = hit.transform.GetComponent<BotCollider>();
-        //            if (collider != null)
-        //            {
-        //                targetPosition.x += ray.origin.x - hit.point.x;
-        //                MergeOrganisms(collider.ParentCell.Organism);
-        //            }
-        //        }
-        //    }
-        //}
-        //if (_targetMoveVector.x > 0)
-        //{
-        //    float dist = diff.x;
-        //    Neighbour neighbour = Neighbour.Right;
-        //    BotCell[] cells = GetCellsFacingDirection(neighbour);
-
-        //    foreach (BotCell cell in cells)
-        //    {
-        //        Ray ray = new Ray(cell.GetRaycastTransform(neighbour).position, _targetMoveVector);
-        //        RaycastHit hit = new RaycastHit();
-        //        Debug.DrawRay(ray.origin, ray.direction, Color.red);
-        //        if (Physics.Raycast(ray, out hit, dist, LayerMask.GetMask("Terrain")))
-        //        {
-        //            targetPosition.x += ray.origin.x - hit.point.x - _colliderBuffer;
-        //        }
-
-        //        else if (Physics.Raycast(ray, out hit, dist, LayerMask.GetMask("BotOrganism")))
-        //        {
-        //            BotCollider collider = hit.transform.GetComponent<BotCollider>();
-        //            if (collider != null)
-        //            {
-        //                targetPosition.x += ray.origin.x - hit.point.x;
-        //                MergeOrganisms(collider.ParentCell.Organism);
-        //            }
-        //        }
-        //    }
-        //}
-        if (_targetMoveVector.y < 0)
+        else
         {
-           // neighbour |= Neighbour.Down;
+            // Center on grid if there's no motion
+            Vector3 pos = targetPosition;
+            pos.x = Mathf.Round(pos.x);
+            targetPosition = pos;
         }
-        if (_targetMoveVector.y > 0)
+
+
+
+        Neighbour lrCollision = GetCollisionInDirection(Neighbour.LeftRight, 0.5f);
+
+
+
+        // check if falling
+        if (_moveVector.y == 0 && lrCollision == Neighbour.None && GetCollisionInDirection(Neighbour.Down, 0.5f) == Neighbour.None)
         {
-           // neighbour |= Neighbour.Up;
+            _animatingMovement = true;
+            _animatingMovementOrigin = transform.position;
+            _animatingMovementTarget = _animatingMovementOrigin;
+            _animatingMovementTarget.y -= 1;
+            _animatingMovementTarget.x = Mathf.Round(_animatingMovementTarget.x);
+            _animatingMovementTarget.y = Mathf.Round(_animatingMovementTarget.y);
+            _animatingMovementStartTime = TimeKeeper.Instance.PlayTimeElapsed;
+        }
+
+        // Y movement is for climbing. It requires collision left or right
+        // Can climb if 
+        // 1. There's room above
+        // 2. There's a wall to climb on
+        else if (_moveVector.y != 0)
+        {
+            // complete a climb
+            if (_moveVector.y > 0f
+            && _climbUpDirection != Neighbour.None
+            && lrCollision == Neighbour.None)
+            {
+                _animatingMovement = true;
+                _animatingMovementOrigin = transform.position;
+                _animatingMovementTarget = _animatingMovementOrigin;
+                _animatingMovementTarget.x += (_climbUpDirection == Neighbour.Right) ? 1 : -1;
+                _animatingMovementTarget.x = Mathf.Round(_animatingMovementTarget.x);
+                _animatingMovementTarget.y = Mathf.Round(_animatingMovementTarget.y);
+                _animatingMovementStartTime = TimeKeeper.Instance.PlayTimeElapsed;
+            }
+            else if (lrCollision != Neighbour.None)
+            {
+                float sign = (_moveVector.y < 0) ? -1 : 1;
+                float dist = diff.y * sign;
+                Neighbour neighbour = sign < 0 ? Neighbour.Down : Neighbour.Up;
+
+                bool hasYDiff = false;
+                float yDiff = float.MaxValue;
+
+
+                BotCell[] cells = GetCellsFacingDirection(neighbour);
+                foreach (BotCell cell in cells)
+                {
+                    BotCell.RaycastResult raycastResult = cell.Raycast(neighbour, dist);
+
+                    if (raycastResult.hit)
+                    {
+                        Ray ray = raycastResult.ray;
+                        RaycastHit hit = raycastResult.NearestHit;
+
+                        float newyDiff = (sign * ray.origin.y) - (sign * hit.point.y) - (sign * _colliderBuffer);
+                        if (Mathf.Abs(newyDiff) < Mathf.Abs(yDiff))
+                        {
+                            yDiff = newyDiff;
+                            hasYDiff = true;
+                        }
+                    }
+                }
+
+                if (hasYDiff)
+                {
+                    targetPosition.y += yDiff;
+                }
+            }
+            else
+            {
+                // reset to current position
+                targetPosition.y = transform.position.y;
+            }
+        }
+        else
+        {
+            // Center on grid if there's no motion
+            Vector3 pos = targetPosition;
+            pos.y = Mathf.Round(pos.y);
+            targetPosition = pos;
         }
 
 
-        
+
+
+        transform.position = Vector3.MoveTowards(transform.position, targetPosition, Time.deltaTime * _moveSpeedModifier);
+        _climbUpDirection = lrCollision;
 
 
 
-        transform.position = targetPosition;
 
-
-
-
-        
     }
 
-    // Jump? That would allow it to climb up? Maybe it just needs to touch. (probably just touch)
-    // Gravity
-    // CanMove
 
+    public void MergeSurrounding()
+    {
+        MergeSurrounding(Neighbour.Up);
+        MergeSurrounding(Neighbour.Down);
+        MergeSurrounding(Neighbour.Left);
+        MergeSurrounding(Neighbour.Right);
+    }
+    private void MergeSurrounding(Neighbour neighbour)
+    {
+        BotCell[] cells = GetCellsFacingDirection(neighbour);
+        foreach (BotCell cell in cells)
+        {
+            Transform raycastTransform = cell.GetRaycastCenterTransform(neighbour);
 
+            Ray ray = new Ray(raycastTransform.position, raycastTransform.forward);
+            RaycastHit hit;
+
+            if (Physics.Raycast(ray, out hit, 0.5f, LayerMask.GetMask("BotOrganism")))
+            {
+                BotCollider collider = hit.transform.GetComponent<BotCollider>();
+                if (collider != null)
+                {
+                    MergeOrganisms(collider.ParentCell.Organism);
+
+                    // Reselect this organism
+                    Selected(true);
+                }
+            }
+        }
+    }
 
 
     // TODO VFX
@@ -216,7 +319,7 @@ public class BotOrganism : MonoBehaviour
     {
         if (absorb == this)
         {
-            Debug.LogError("Attempting to absorb itself.");
+            Debug.Log("Attempting to absorb itself.");
             return;
         }
 
@@ -243,36 +346,67 @@ public class BotOrganism : MonoBehaviour
 
 
 
+    //private bool HasDiagonalCollision(Neighbour neighbourM)
+    //{
+    //    Neighbour[] neighbours = NeighbourUtil.GetNeighboursFromMask(Neighbour.LeftRight);
+    //    foreach (Neighbour neighbour in neighbours)
+    //    {
+    //        BotCell[] cells = GetCellsFacingDirection(neighbour);
+
+    //        foreach (BotCell cell in cells)
+    //        {
+    //            // Raycast in the direction we're going
+
+    //            // If something's there, return false
+    //            Transform raycastTransform = cell.GetRaycastTransform(neighbour);
+    //            Ray ray = new Ray(raycastTransform.position, raycastTransform.forward);
+    //            RaycastHit hit = new RaycastHit();
+    //            if (Physics.Raycast(ray, out hit, distance))
+    //            {
+    //                return true;
+    //            }
+    //        }
+    //    }
+
+    //    // If none found a blocker, return true
+    //    return false;
+    //}
 
 
-
-
+    // Accepts a mask of neighbours
     // TODO check edges when moving up. The organism may need to center
-    private bool CanMove(Vector2 dir)
+    private bool HasCollisionInDirection(Neighbour neighbourMask)
     {
-        Neighbour neighbour = NeighbourUtil.GetNeighbourByOffset(dir);
+        Neighbour mask = GetCollisionInDirection(neighbourMask, _colliderBuffer);
+        return mask != Neighbour.None;
+    }
 
+    private Neighbour GetCollisionInDirection(Neighbour neighbourMask, float distance)
+    {
+        Neighbour outMask = Neighbour.None;
 
         // Check each cell
-        // For each face without another cell
-        BotCell[] cells = GetCellsFacingDirection(neighbour);
+        // For each face without another cell\
 
-        foreach (BotCell cell in cells)
+        Neighbour[] neighbours = NeighbourUtil.GetNeighboursFromMask(neighbourMask);
+        foreach (Neighbour neighbour in neighbours)
         {
-            // Raycast in the direction we're going
+            BotCell[] cells = GetCellsFacingDirection(neighbour);
 
-            // If something's there, return false
-
-            Ray ray = new Ray(cell.transform.position, dir);
-            RaycastHit hit = new RaycastHit();
-            if (Physics.Raycast(ray, out hit, 1f, LayerMask.GetMask("Terrain"))) 
+            foreach (BotCell cell in cells)
             {
-                return false;
+                // Raycast in the direction we're going
+                BotCell.RaycastResult raycastResult = cell.Raycast(neighbour);
+
+                if (raycastResult.hit)
+                {
+                    outMask |= neighbour;
+                }
             }
         }
 
         // If none found a blocker, return true
-        return true;
+        return outMask;
     }
 
     private BotCell[] GetCellsFacingDirection(Neighbour dir)
@@ -298,6 +432,6 @@ public class BotOrganism : MonoBehaviour
 
     public void Move(Vector2 v)
     {
-        _targetMoveVector = v;
+        _moveVector = v;
     }
 }

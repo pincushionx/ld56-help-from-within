@@ -79,6 +79,26 @@ namespace Oneill
             }
             return neighbour;
         }
+        public static Neighbour GetBestNeighbourByOffset(Vector2 offset)
+        {
+            if (offset.x < 0)
+            {
+                return Neighbour.Left;
+            }
+            if (offset.x > 0)
+            {
+                return Neighbour.Right;
+            }
+            if (offset.y < 0)
+            {
+                return Neighbour.Down;
+            }
+            if (offset.y > 0)
+            {
+                return Neighbour.Up;
+            }
+            return Neighbour.None;
+        }
         public static Neighbour[] GetNeighboursFromMask(Neighbour neighbourMask)
         {
             int neighbourCount = IntUtil.CountSetBits((int)neighbourMask);

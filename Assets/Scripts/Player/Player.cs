@@ -36,6 +36,7 @@ public class Player : MonoBehaviour
     {
         Scene.InputManager.MoveEvent += OnMove;
         Scene.InputManager.SelectEvent += OnSelect;
+        Scene.InputManager.MergeEvent += OnMerge;
     }
 
     private void Update()
@@ -52,7 +53,23 @@ public class Player : MonoBehaviour
 
     private void OnMove(Vector2 v)
     {
-        if (_selectedOrganism != null)
+        if (_selectionMode == SelectionMode.Cell)
+        {
+            // Deselect the previous organism
+            _selectedOrganism?.Selected(false);
+
+            // Disconnect 
+            // Reconnect with neighbours in move direction
+            _selectedOrganism = Scene.BotManager.DisconnectCells(_selectedCell, NeighbourUtil.GetBestNeighbourByOffset(v));
+
+            // Select new organism
+            _selectionMode = SelectionMode.Organism;
+            _selectedOrganism.Selected(true);
+
+            // Finally, move the new organism
+            _selectedOrganism.Move(v);
+        }
+        else if (_selectedOrganism != null)
         {
             _selectedOrganism.Move(v);
         }
@@ -75,7 +92,7 @@ public class Player : MonoBehaviour
 
             if (disconnect != null)
             {
-                disconnect.Cell.Organism.DisconnectCells(disconnect.Cell, disconnect.Neighbour);
+                //disconnect.Cell.Organism.DisconnectCells(disconnect.Cell, disconnect.Neighbour);
             }
 
             else
@@ -85,37 +102,37 @@ public class Player : MonoBehaviour
                 if (collider != null)
                 {
 
-                    _selectedOrganism?.Selected(false);
-                    somethingSelected = true;
-                    collider.ParentCell.Organism.Selected(true);
-                    _selectedOrganism = collider.ParentCell.Organism;
-                    _selectedCell = null;
-                    _selectionMode = SelectionMode.Organism;
+                    //_selectedOrganism?.Selected(false);
+                    //somethingSelected = true;
+                    //collider.ParentCell.Organism.Selected(true);
+                    //_selectedOrganism = collider.ParentCell.Organism;
+                    //_selectedCell = null;
+                    //_selectionMode = SelectionMode.Organism;
 
 
-                    //if (
-                    //    (_selectionMode == SelectionMode.None || _selectionMode == SelectionMode.Organism)
-                    // || (_selectionMode == SelectionMode.Cell && collider.ParentCell != _selectedCell))
-                    //{
-                    //    // Do cell
-                    //    _selectedOrganism?.Selected(false);
-                    //    somethingSelected = true;
-                    //    collider.ParentCell.Organism.Selected(false);
-                    //    collider.ParentCell.SelectedCell(true);
-                    //    _selectedCell = collider.ParentCell;
-                    //    _selectedOrganism = collider.ParentCell.Organism;
-                    //    _selectionMode = SelectionMode.Cell;
-                    //}
-                    //else if (_selectionMode == SelectionMode.Cell)
-                    //{
-                    //    // Do organism
-                    //    _selectedOrganism?.Selected(false);
-                    //    somethingSelected = true;
-                    //    collider.ParentCell.Organism.Selected(true);
-                    //    _selectedOrganism = collider.ParentCell.Organism;
-                    //    _selectedCell = null;
-                    //    _selectionMode = SelectionMode.Organism;
-                    //}
+                    if (
+                        (_selectionMode == SelectionMode.None || _selectionMode == SelectionMode.Organism)
+                     || (_selectionMode == SelectionMode.Cell && collider.ParentCell != _selectedCell))
+                    {
+                        // Do cell
+                        _selectedOrganism?.Selected(false);
+                        somethingSelected = true;
+                        collider.ParentCell.Organism.Selected(false);
+                        collider.ParentCell.SelectedCell(true);
+                        _selectedCell = collider.ParentCell;
+                        _selectedOrganism = collider.ParentCell.Organism;
+                        _selectionMode = SelectionMode.Cell;
+                    }
+                    else if (_selectionMode == SelectionMode.Cell)
+                    {
+                        // Do organism
+                        _selectedOrganism?.Selected(false);
+                        somethingSelected = true;
+                        collider.ParentCell.Organism.Selected(true);
+                        _selectedOrganism = collider.ParentCell.Organism;
+                        _selectedCell = null;
+                        _selectionMode = SelectionMode.Organism;
+                    }
 
                 }
             }
@@ -124,6 +141,18 @@ public class Player : MonoBehaviour
         if (!somethingSelected)
         {
             ClearSelection();
+        }
+    }
+
+    private void OnMerge()
+    {
+        if (_selectedOrganism != null)
+        {
+            _selectedOrganism.MergeSurrounding();
+        }
+        else
+        {
+            //TODO Give feedback saying there's nothing to merge
         }
     }
 
