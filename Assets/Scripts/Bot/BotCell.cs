@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class BotCell : MonoBehaviour
 {
+    public bool Selectable = true;
+
+
     public BotOrganism Organism { get; private set; }
 
     private BotCell[] _neighbourCells = null; // Maintained by parent organism

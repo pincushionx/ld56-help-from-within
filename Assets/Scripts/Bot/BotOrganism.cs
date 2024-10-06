@@ -157,7 +157,7 @@ public class BotOrganism : MonoBehaviour
             BotCell[] cells = GetCellsFacingDirection(neighbour);
             foreach (BotCell cell in cells)
             {
-                BotCell.RaycastResult raycastResult = cell.Raycast(neighbour, dist);
+                BotCell.RaycastResult raycastResult = cell.Raycast(neighbour, Mathf.Abs(dist));
 
                 if (raycastResult.hit)
                 {
@@ -217,7 +217,18 @@ public class BotOrganism : MonoBehaviour
                 _animatingMovement = true;
                 _animatingMovementOrigin = transform.position;
                 _animatingMovementTarget = _animatingMovementOrigin;
-                _animatingMovementTarget.x += (_climbUpDirection == Neighbour.Right) ? 1 : -1;
+
+
+                if (_moveVector.x != 0)
+                {
+                    _animatingMovementTarget.x += _moveVector.x > 0 ? 1 : -1;
+                }
+                else
+                {
+                    _animatingMovementTarget.x += (_climbUpDirection == Neighbour.Right) ? 1 : -1;
+                }
+
+
                 _animatingMovementTarget.x = Mathf.Round(_animatingMovementTarget.x);
                 _animatingMovementTarget.y = Mathf.Round(_animatingMovementTarget.y);
                 _animatingMovementStartTime = TimeKeeper.Instance.PlayTimeElapsed;

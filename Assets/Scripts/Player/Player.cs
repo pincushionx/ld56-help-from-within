@@ -102,15 +102,11 @@ public class Player : MonoBehaviour
                 if (collider != null)
                 {
 
-                    //_selectedOrganism?.Selected(false);
-                    //somethingSelected = true;
-                    //collider.ParentCell.Organism.Selected(true);
-                    //_selectedOrganism = collider.ParentCell.Organism;
-                    //_selectedCell = null;
-                    //_selectionMode = SelectionMode.Organism;
-
-
-                    if (
+                    if (!collider.ParentCell.Selectable)
+                    {
+                        Debug.Log("Clicked on unselectable bot");
+                    }
+                    else if (
                         (_selectionMode == SelectionMode.None || _selectionMode == SelectionMode.Organism)
                      || (_selectionMode == SelectionMode.Cell && collider.ParentCell != _selectedCell))
                     {
