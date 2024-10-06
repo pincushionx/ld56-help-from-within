@@ -4,7 +4,7 @@ using UnityEngine.Audio;
 
 public class GameManager : MonoBehaviourSingleton<GameManager>
 {
-    public string Day = null;
+    public LevelData Level;
     public bool IsSingleLevelGame = false;
 
     public AudioMixer AudioMixer;
@@ -40,15 +40,46 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
     public void StartGame()
     {
         IsSingleLevelGame = false;
-        Day = null;
-        UnityEngine.SceneManagement.SceneManager.LoadScene("GameScene");
+        Level = Levels[0];
+        UnityEngine.SceneManagement.SceneManager.LoadScene(Level.SceneId);
     }
 
-    public void ShowLevel(string dayName)
+    public void ShowLevel(string sceneId)
     {
         IsSingleLevelGame = true;
-        Day = dayName;
-        UnityEngine.SceneManagement.SceneManager.LoadScene("GameScene");
+
+        Level = GetLevelBySceneId(sceneId);
+
+        if (Level.SceneId == "" || Level.SceneId == null)
+        {
+            StartGame();
+        }
+        else
+        {
+            UnityEngine.SceneManagement.SceneManager.LoadScene(Level.SceneId);
+        }
+    }
+
+    public bool HasNextLevel()
+    {
+        return Level.Index+1 < Levels.Length;
+    }
+    public LevelData GetNextLevel()
+    {
+        if (HasNextLevel())
+        {
+            return Levels[Level.Index + 1];
+        }
+        return default(LevelData);
+    }
+
+    public LevelData GetLevelBySceneId(string sceneId)
+    {
+        foreach (var level in Levels)
+        {
+            if(level.SceneId == sceneId) return level;
+        }
+        return default;
     }
 
 
@@ -78,4 +109,33 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
     {
         AudioListener.volume = volume;
     }
+
+
+
+    public struct LevelData
+    {
+        public int Index;
+        public string Label;
+        public string SceneId;
+
+        public LevelData(int index, string label, string id)
+        {
+            Index = index;
+            Label = label;
+            SceneId = id;
+        }
+    }
+
+    public LevelData[] Levels = new LevelData[] {
+        new LevelData(0, "Entry Level", "EntryLevelScene"),
+        new LevelData(1, "Getting Over It", "LowClimbScene"),
+        new LevelData(2, "Two Tumors", "TwoTumorsScene"),
+        new LevelData(3, "We're a Team!", "MergeSplitScene"),
+        new LevelData(4, "A Bridge Apart", "BridgeScene"),
+        new LevelData(5, "Need a Boost", "MergeSplit2Scene"),
+        new LevelData(6, "Stuck Together", "StaticShapeScene"),
+        new LevelData(7, "Steps", "SteppedScene"),
+        new LevelData(8, "Got a fork?", "PitchforkScene"),
+        //new LevelData(2, "Sample Scene", "SampleScene")
+    };
 }

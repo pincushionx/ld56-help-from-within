@@ -6,6 +6,46 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/StartScene.unity
+    guid: 15bf1db597f53ff4998d297ed8e7696c
+  - enabled: 1
+    path: Assets/Scenes/HowToPlayScene.unity
+    guid: 079495e078813ed44a64413bb328267a
+  - enabled: 1
+    path: Assets/Scenes/LevelSelectScene.unity
+    guid: e3b1c5c17b8b56046bc5560de8158bcd
+  - enabled: 1
+    path: Assets/Scenes/CreditsScene.unity
+    guid: 50b8153b1e81aa245a4997b6409fca72
+  - enabled: 1
     path: Assets/Scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/Scenes/EntryLevelScene.unity
+    guid: 11f6cb116c629d144bf78f1ead95a845
+  - enabled: 1
+    path: Assets/Scenes/LowClimbScene.unity
+    guid: 402fae824945c6c40a81d32ab525455c
+  - enabled: 1
+    path: Assets/Scenes/StaticShapeScene.unity
+    guid: 4c0f5ec692a55e44da234e6cb1e60b4e
+  - enabled: 1
+    path: Assets/Scenes/MergeSplitScene.unity
+    guid: 7775a3b4391519e44be231163a57cf6f
+  - enabled: 1
+    path: Assets/Scenes/MergeSplit2Scene.unity
+    guid: 03175319230dd5f4dac91d5a776d19cb
+  - enabled: 1
+    path: Assets/Scenes/TwoTumorsScene.unity
+    guid: ec4a6ea3a1868494a9a1284c3e7cf00d
+  - enabled: 1
+    path: Assets/Scenes/BridgeScene.unity
+    guid: 3f01e1a5cc8c2fb4aa44a7eeadb7b1a1
+  - enabled: 1
+    path: Assets/Scenes/SteppedScene.unity
+    guid: 7835c7d76b43bb743a8bd90fd6dc695a
+  - enabled: 1
+    path: Assets/Scenes/PitchforkScene.unity
+    guid: acaddf82d06f2cc498e2304c14f50168
   m_configObjects: {}
+  m_UseUCBPForAssetBundles: 0

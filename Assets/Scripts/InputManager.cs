@@ -66,7 +66,8 @@ public class InputManager : MonoBehaviour, Input.IBotActions, Input.IFlowActions
 
     public void DisableAllInput()
     {
-       // _input.Bot.Disable();
+       _input.Bot.Disable();
+       _input.Flow.Disable();
     }
 
     public void OnMove(InputAction.CallbackContext context)

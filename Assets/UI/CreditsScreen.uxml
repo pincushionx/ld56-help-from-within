@@ -1,0 +1,14 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/main.uss?fileID=7433441132597879392&amp;guid=8b23b81a1405a914985b0fa8c2fdeba1&amp;type=3#main" />
+    <engine:VisualElement style="flex-grow: 1; background-color: rgb(253, 240, 213);">
+        <engine:VisualElement style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Assets/Images/Logo.png?fileID=2800000&amp;guid=559bad791539e6b4fa2e8a889d0aca68&amp;type=3#Logo&quot;); position: absolute; -unity-background-scale-mode: scale-to-fit; top: 5%; right: 7%; left: 70%; bottom: 75%;" />
+        <engine:VisualElement style="flex-grow: 1; align-self: center; width: 90%; top: 25%; position: absolute; flex-wrap: nowrap; flex-direction: column;">
+            <engine:Label text="Credits" name="Label" style="position: relative; font-size: 32px; flex-grow: 1; flex-shrink: 1; -unity-text-align: upper-center;" />
+            <engine:Label text="Weather Icons by Sihan Liu&#10;- https://www.iconfinder.com/iconsets/weather-color-2&#10;&#10;Smiley icons by Emily Jäger&#10;- https://openmoji.org&#10;&#10;Font&#10;- Orbitron by Matt McInerney&#10;&#10;Animations&#10;- &quot;ULTIMATE ANIMATION COLLECTION&quot; by PROTOFACTOR, INC (unity asset store)&#10;&#10;Most 3D Models&#10;- Poly Universal Pack by polyperfect (unity asset store)&#10;&#10;Some materials&#10;- Polyhaven&#10;&#10;Remainder by Pincushionx for the Brackeys 2024.2 game jam with the theme &quot;Calm Before the Storm&quot;&#10;&#10;&#10;" name="Text" style="position: relative; font-size: 20px; flex-grow: 1; flex-shrink: 1; -unity-text-align: upper-left; flex-wrap: wrap; white-space: normal;" />
+            <engine:VisualElement name="Spacer" style="flex-grow: 1; height: 25px;" />
+            <engine:VisualElement style="align-self: center; flex-grow: 1; min-width: 100%; align-items: center; min-height: 50px;">
+                <engine:Button text="Back" name="BackButton" style="position: absolute;" />
+            </engine:VisualElement>
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>

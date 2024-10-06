@@ -98,25 +98,70 @@ public class Player : MonoBehaviour
             else
             {
 
-                BotCollider collider = hit.transform.GetComponent<BotCollider>();
+                //BotCollider collider = hit.transform.GetComponent<BotCollider>();
+                //if (collider != null)
+                //{
+
+                //    if (!collider.ParentCell.Selectable)
+                //    {
+                //        Debug.Log("Clicked on unselectable bot");
+                //        _selectedOrganism?.Selected(false);
+                //        somethingSelected = true;
+                //        collider.ParentCell.Organism.Selected(true);
+                //        _selectedOrganism = collider.ParentCell.Organism;
+                //        _selectedCell = null;
+                //        _selectionMode = SelectionMode.Organism;
+                //    }
+                //    else if (
+                //        (_selectionMode == SelectionMode.None || _selectionMode == SelectionMode.Organism)
+                //     || (_selectionMode == SelectionMode.Cell && collider.ParentCell != _selectedCell))
+                //    {
+                //        // Do cell
+                //        _selectedOrganism?.Selected(false);
+                //        somethingSelected = true;
+                //        collider.ParentCell.Organism.Selected(false);
+                //        collider.ParentCell.SelectedCell(true);
+                //        _selectedCell = collider.ParentCell;
+                //        _selectedOrganism = collider.ParentCell.Organism;
+                //        _selectionMode = SelectionMode.Cell;
+                //    }
+                //    else if (_selectionMode == SelectionMode.Cell)
+                //    {
+                //        // Do organism
+                //        _selectedOrganism?.Selected(false);
+                //        somethingSelected = true;
+                //        collider.ParentCell.Organism.Selected(true);
+                //        _selectedOrganism = collider.ParentCell.Organism;
+                //        _selectedCell = null;
+                //        _selectionMode = SelectionMode.Organism;
+                //    }
+
+                //}
+                BotCell collider = hit.transform.GetComponent<BotCell>();
                 if (collider != null)
                 {
 
-                    if (!collider.ParentCell.Selectable)
+                    if (!collider.Selectable)
                     {
-                        Debug.Log("Clicked on unselectable bot");
+                        //Debug.Log("Clicked on unselectable bot");
+                        _selectedOrganism?.Selected(false);
+                        somethingSelected = true;
+                        collider.Organism.Selected(true);
+                        _selectedOrganism = collider.Organism;
+                        _selectedCell = null;
+                        _selectionMode = SelectionMode.Organism;
                     }
                     else if (
                         (_selectionMode == SelectionMode.None || _selectionMode == SelectionMode.Organism)
-                     || (_selectionMode == SelectionMode.Cell && collider.ParentCell != _selectedCell))
+                     || (_selectionMode == SelectionMode.Cell && collider != _selectedCell))
                     {
                         // Do cell
                         _selectedOrganism?.Selected(false);
                         somethingSelected = true;
-                        collider.ParentCell.Organism.Selected(false);
-                        collider.ParentCell.SelectedCell(true);
-                        _selectedCell = collider.ParentCell;
-                        _selectedOrganism = collider.ParentCell.Organism;
+                        collider.Organism.Selected(false);
+                        collider.SelectedCell(true);
+                        _selectedCell = collider;
+                        _selectedOrganism = collider.Organism;
                         _selectionMode = SelectionMode.Cell;
                     }
                     else if (_selectionMode == SelectionMode.Cell)
@@ -124,8 +169,8 @@ public class Player : MonoBehaviour
                         // Do organism
                         _selectedOrganism?.Selected(false);
                         somethingSelected = true;
-                        collider.ParentCell.Organism.Selected(true);
-                        _selectedOrganism = collider.ParentCell.Organism;
+                        collider.Organism.Selected(true);
+                        _selectedOrganism = collider.Organism;
                         _selectedCell = null;
                         _selectionMode = SelectionMode.Organism;
                     }
@@ -145,6 +190,8 @@ public class Player : MonoBehaviour
         if (_selectedOrganism != null)
         {
             _selectedOrganism.MergeSurrounding();
+            _selectionMode = SelectionMode.Organism;
+            _selectedOrganism.Selected(true);
         }
         else
         {

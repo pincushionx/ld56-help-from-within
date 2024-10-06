@@ -188,6 +188,17 @@ public partial class @Input: IInputActionCollection2, IDisposable
                     ""action"": ""Merge"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9186ec2b-ca6f-4420-8e7a-9f1999648a5c"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Merge"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },

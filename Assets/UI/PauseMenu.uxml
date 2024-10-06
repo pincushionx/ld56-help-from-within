@@ -1,0 +1,17 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/main.uss?fileID=7433441132597879392&amp;guid=8b23b81a1405a914985b0fa8c2fdeba1&amp;type=3#main" />
+    <engine:VisualElement style="flex-grow: 1; background-color: rgba(253, 240, 213, 0.75); position: absolute; top: 20%; left: 20%; bottom: 20%; right: 20%; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; background-image: url(&quot;project://database/Assets/Assets/Materials/Blood2/blood2_ao.png?fileID=2800000&amp;guid=fea97b021c2568e46a4b240bf43bab1d&amp;type=3#blood2_ao&quot;);">
+        <engine:VisualElement style="flex-grow: 1; align-self: center; width: 25%; top: 20%; position: absolute;">
+            <engine:Label text="Paused" style="align-items: auto; font-size: 24px; -unity-text-align: upper-center;" />
+            <engine:VisualElement name="Spacer" style="flex-grow: 1; height: 25px;" />
+            <engine:Slider label="Music" value="42" high-value="20" name="MusicSlider" low-value="-80" />
+            <engine:Slider label="Sounds" value="42" high-value="20" name="SFXSlider" low-value="-80" />
+            <engine:VisualElement name="Spacer" style="flex-grow: 1; height: 25px;" />
+            <engine:VisualElement style="align-self: center; flex-grow: 1; flex-direction: row;">
+                <engine:Button text="Restart Level" name="RestartLevelButton" style="flex-grow: 1; flex-direction: row;" />
+                <engine:Button text="Back to Start" name="BackToStartButton" />
+                <engine:Button text="Resume" name="ResumeButton" />
+            </engine:VisualElement>
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>

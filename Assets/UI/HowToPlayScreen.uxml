@@ -1,0 +1,23 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/main.uss?fileID=7433441132597879392&amp;guid=8b23b81a1405a914985b0fa8c2fdeba1&amp;type=3#main" />
+    <engine:VisualElement style="flex-grow: 1; background-color: rgb(253, 240, 213); background-image: url(&quot;project://database/Assets/Assets/Materials/Blood2/blood2_ao.png?fileID=2800000&amp;guid=fea97b021c2568e46a4b240bf43bab1d&amp;type=3#blood2_ao&quot;);">
+        <engine:VisualElement style="flex-grow: 1; align-self: center; width: 90%; top: 10%; position: absolute; flex-wrap: nowrap; flex-direction: column;">
+            <engine:Label text="How to Play" name="Label" style="position: relative; font-size: 32px; flex-grow: 1; flex-shrink: 1; -unity-text-align: upper-center;" />
+            <engine:VisualElement name="VisualElement" style="flex-grow: 1; flex-direction: row;">
+                <engine:VisualElement name="VisualElement" style="flex-grow: 1; min-width: 50%; max-width: 40%;">
+                    <engine:Label text="Situation" name="Label" selectable="true" style="position: relative; font-size: 32px; -unity-text-align: upper-center;" />
+                    <engine:Label text="Tumors have infected your patient&apos;s body. Luckily, you have nanobots capable of curing this ailment. Move the nanobots to the tumors, and they&apos;ll do the rest." name="Text" style="position: relative; font-size: 20px; flex-grow: 1; flex-shrink: 1; -unity-text-align: upper-left; flex-wrap: wrap; white-space: normal;" />
+                </engine:VisualElement>
+                <engine:VisualElement name="VSpacer" style="flex-grow: 1; max-width: 2%; min-width: 2%;" />
+                <engine:VisualElement style="flex-grow: 1; max-width: 50%; min-width: 50%;">
+                    <engine:Label text="Controls" name="Label" style="position: relative; font-size: 32px; -unity-text-align: upper-center;" />
+                    <engine:Label text="Select a nanobot by clicking on it.&#10;&#10;Click a second time to select a collection of bots, if they&apos;re connected.&#10;&#10;W/S/A/D or Arrows to move&#10;&#10;Enter or E to connect adjacent bots" name="Text" style="position: relative; font-size: 20px; flex-grow: 1; flex-shrink: 1; -unity-text-align: upper-left; flex-wrap: wrap; white-space: normal;" />
+                </engine:VisualElement>
+            </engine:VisualElement>
+            <engine:VisualElement name="Spacer" style="flex-grow: 1; height: 25px;" />
+            <engine:VisualElement style="align-self: center; flex-grow: 1; min-width: 100%; align-items: center; min-height: 300px;">
+                <engine:Button text="Back" name="BackButton" style="position: absolute; -unity-font-style: bold;" />
+            </engine:VisualElement>
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>

@@ -1,0 +1,20 @@
+.unity-slider__label {
+    min-width: 80px;
+    -unity-font-definition: url("project://database/Assets/Assets/Fonts/Fredoka/static/Fredoka-Regular.ttf?fileID=12800000&guid=3de0f87058faad643a3dd6cb655640bd&type=3#Fredoka-Regular");
+}
+
+.unity-button {
+    border-left-color: rgb(120, 0, 0);
+    border-right-color: rgb(120, 0, 0);
+    border-top-color: rgb(120, 0, 0);
+    border-bottom-color: rgb(120, 0, 0);
+    background-color: rgb(193, 174, 175);
+}
+
+.unity-text-element {
+    -unity-font-definition: url("project://database/Assets/Assets/Fonts/Fredoka/static/Fredoka-Regular.ttf?fileID=12800000&guid=3de0f87058faad643a3dd6cb655640bd&type=3#Fredoka-Regular");
+}
+
+.unity-button:hover {
+    background-color: rgb(193, 18, 31);
+}

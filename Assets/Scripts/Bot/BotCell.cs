@@ -9,7 +9,7 @@ public class BotCell : MonoBehaviour
 
     public BotOrganism Organism { get; private set; }
 
-    private BotCell[] _neighbourCells = null; // Maintained by parent organism
+    public BotCell[] NeighbourCells = null; // Maintained by parent organism
     public Transform[] RaycastTransformCenter;
 
     public Transform[][] RaycastTransforms;
@@ -19,6 +19,10 @@ public class BotCell : MonoBehaviour
     public Transform[] RaycastTransformRight;
     public Transform DisconnectButtonContainer;
 
+    public GameObject[] PermanentlyConnectionIcons;
+    public GameObject[] TemporarilyConnectionIcons;
+
+
 
     private BotCellSelection _selection;
 
@@ -26,7 +30,7 @@ public class BotCell : MonoBehaviour
     {
         Organism = organism;
 
-        _neighbourCells = neighbourCells;
+        NeighbourCells = neighbourCells;
 
         _selection = GetComponentInChildren<BotCellSelection>(true);
         _selection.Init(this);
@@ -37,18 +41,62 @@ public class BotCell : MonoBehaviour
         RaycastTransforms[1] = RaycastTransformDown;
         RaycastTransforms[2] = RaycastTransformLeft;
         RaycastTransforms[3] = RaycastTransformRight;
+
+
+        // Add the chain, if needed
+        //if (!Selectable)
+        //{
+        //    for (int i = 0; i < _neighbourCells.Length; i++)
+        //    {
+        //        if (_neighbourCells[i] == null)
+        //        {
+        //            PermanentlyConnectionIcons[i].SetActive(false);
+        //            continue;
+        //        }
+        //        PermanentlyConnectionIcons[i].SetActive(!_neighbourCells[i].Selectable);
+        //    }
+        //}
+        //else
+        //{
+        //    for (int i = 0; i < _neighbourCells.Length; i++)
+        //    {
+        //        // Perm
+        //        bool permLink = (!Selectable && _neighbourCells[i] != null && !_neighbourCells[i].Selectable);
+        //        PermanentlyConnectionIcons[i].SetActive(permLink);
+
+        //        // Temp
+        //        if (_neighbourCells[i] == null)
+        //        {
+        //            TemporarilyConnectionIcons[i].SetActive(false);
+        //            continue;
+        //        }
+        //        TemporarilyConnectionIcons[i].SetActive(_neighbourCells[i].Selectable);
+        //    }
+        //}
+
+        for (int i = 0; i < NeighbourCells.Length; i++)
+        {
+            // Perm
+            bool permLink = (!Selectable && NeighbourCells[i] != null && !NeighbourCells[i].Selectable);
+            PermanentlyConnectionIcons[i].SetActive(permLink);
+
+            // Temp
+            bool tempLink = (!permLink && NeighbourCells[i] != null);
+            TemporarilyConnectionIcons[i].SetActive(tempLink);
+        }
     }
 
     public bool HasNeighbour(Neighbour n)
     {
         int i = NeighbourUtil.GetNeighbourIndex(n);
-        return _neighbourCells[i] != null;
+        return NeighbourCells[i] != null;
     }
     public BotCell GetNeighbour(Neighbour n)
     {
         int i = NeighbourUtil.GetNeighbourIndex(n);
-        return _neighbourCells[i];
+        return NeighbourCells[i];
     }
+
 
 
     public RaycastResult Raycast(Neighbour n)
@@ -68,9 +116,9 @@ public class BotCell : MonoBehaviour
             Ray ray = new Ray(transform.position, transform.forward);
             RaycastHit hit;
 
-            Debug.DrawRay(ray.origin, ray.direction, Color.red);
+            Debug.DrawRay(ray.origin, ray.direction * distance, Color.red);
 
-            if (Physics.Raycast(ray, out hit, distance))
+            if (Physics.Raycast(ray, out hit, distance, 0xFFFF, QueryTriggerInteraction.Ignore))
             {
                 if (hit.distance < nearest)
                 {
